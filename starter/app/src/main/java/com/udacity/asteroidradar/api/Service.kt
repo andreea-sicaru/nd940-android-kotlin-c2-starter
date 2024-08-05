@@ -3,7 +3,8 @@ package com.udacity.asteroidradar.api
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import com.udacity.asteroidradar.Constants.API_KEY
+import com.udacity.asteroidradar.BuildConfig
+//import com.udacity.asteroidradar.Constants.API_KEY
 import com.udacity.asteroidradar.Constants.BASE_URL
 import com.udacity.asteroidradar.model.PictureOfDay
 import kotlinx.coroutines.Deferred
@@ -33,7 +34,7 @@ private val retrofit = Retrofit.Builder()
     .baseUrl(BASE_URL).client(
         OkHttpClient().newBuilder().addInterceptor { chain ->
             val url =
-                chain.request().url().newBuilder().addQueryParameter("api_key", API_KEY).build()
+                chain.request().url().newBuilder().addQueryParameter("api_key", BuildConfig.API_KEY).build()
             chain.proceed(chain.request().newBuilder().url(url).build())
         }.build()
     ).build()
