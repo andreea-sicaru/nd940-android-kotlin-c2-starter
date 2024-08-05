@@ -1,9 +1,15 @@
 package com.udacity.asteroidradar.main
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.snackbar.Snackbar
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 
@@ -19,6 +25,15 @@ class MainFragment : Fragment() {
         binding.lifecycleOwner = this
 
         binding.viewModel = viewModel
+
+        val adapter = AsteroidAdapter(AsteroidClickListener {
+            Snackbar.make(
+                requireActivity().findViewById(android.R.id.content),
+                it.codename,
+                Snackbar.LENGTH_SHORT // How long to display the message.
+            ).show()
+        })
+        binding.asteroidRecycler.adapter = adapter
 
         setHasOptionsMenu(true)
 

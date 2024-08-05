@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.udacity.asteroidradar.api.NasaApi
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.model.Asteroid
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
@@ -19,16 +20,20 @@ class MainViewModel : ViewModel() {
     val pictureOfTheDayDescription: LiveData<String?>
         get() = _pictureOfTheDayDescription
 
+    private val _asteroids = MutableLiveData<List<Asteroid>>()
+    val asteroids: LiveData<List<Asteroid>>
+        get() = _asteroids
+
     init {
+//        _asteroids.value = emptyList()
         getPictureOfTheDay()
         getFeed()
     }
 
     private fun getFeed() {
         viewModelScope.launch {
-            val feed = NasaApi.service.getAsteroidsAsync("2024-08-01", "2024-08-02").await()
-            val asteroidsList = parseAsteroidsJsonResult(JSONObject(feed))
-            System.out.println(feed)
+            val feed = NasaApi.service.getAsteroidsAsync("2024-07-29", "2024-08-05").await()
+            _asteroids.value = parseAsteroidsJsonResult(JSONObject(feed))
         }
     }
 
