@@ -24,6 +24,8 @@ private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 /**
  * Use the Retrofit builder to build a retrofit object using a Moshi converter with our Moshi
  * object.
+ *
+ * Add your API_KEY to local.properties file for the app to work.g
  */
 private val retrofit = Retrofit.Builder()
     .addConverterFactory(ScalarsConverterFactory.create())
