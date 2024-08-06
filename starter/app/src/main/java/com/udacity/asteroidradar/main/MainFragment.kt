@@ -10,15 +10,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.snackbar.Snackbar
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
-import com.udacity.asteroidradar.model.Asteroid
 
 class MainFragment : Fragment() {
 
     private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(this).get(MainViewModel::class.java)
+        val activity = requireActivity()
+        ViewModelProvider(
+            this,
+            MainViewModelFactory(activity.application)
+        ).get(MainViewModel::class.java)
     }
 
     override fun onCreateView(

@@ -1,16 +1,17 @@
 package com.udacity.asteroidradar.main
 
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.udacity.asteroidradar.api.NasaApi
-import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.database.getDatabase
 import com.udacity.asteroidradar.model.Asteroid
+import com.udacity.asteroidradar.repository.AsteroidsRepository
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : ViewModel() {
 
     private val _pictureOfTheDayUrl = MutableLiveData<String?>()
     val pictureOfTheDayUrl: LiveData<String?>
@@ -20,23 +21,24 @@ class MainViewModel : ViewModel() {
     val pictureOfTheDayDescription: LiveData<String?>
         get() = _pictureOfTheDayDescription
 
-    private val _asteroids = MutableLiveData<List<Asteroid>>()
-    val asteroids: LiveData<List<Asteroid>>
-        get() = _asteroids
 
-    private val _navigateToSelectedAsteroid = MutableLiveData<Asteroid>()
-    val navigateToSelectedAsteroid: LiveData<Asteroid>
+    private val _navigateToSelectedAsteroid = MutableLiveData<Asteroid?>()
+    val navigateToSelectedAsteroid: LiveData<Asteroid?>
         get() = _navigateToSelectedAsteroid
+
+    private val database = getDatabase(application)
+    private val asteroidsRepository = AsteroidsRepository(database)
+
+    val asteroids = asteroidsRepository.asteroids
 
     init {
         getPictureOfTheDay()
-        getFeed()
+        refreshAsteroids()
     }
 
-    private fun getFeed() {
+    private fun refreshAsteroids() {
         viewModelScope.launch {
-            val feed = NasaApi.service.getAsteroidsAsync("2024-07-29", "2024-08-05").await()
-            _asteroids.value = parseAsteroidsJsonResult(JSONObject(feed))
+            asteroidsRepository.refreshAsteroids()
         }
     }
 
