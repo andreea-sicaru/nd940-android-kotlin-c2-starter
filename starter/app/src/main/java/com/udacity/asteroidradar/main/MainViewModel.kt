@@ -27,7 +27,7 @@ class MainViewModel(application: Application) : ViewModel() {
         get() = _navigateToSelectedAsteroid
 
     private val database = getDatabase(application)
-    private val asteroidsRepository = AsteroidsRepository(database)
+    private val asteroidsRepository = AsteroidsRepository(application.applicationContext, database)
 
     val asteroids = asteroidsRepository.asteroids
 

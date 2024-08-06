@@ -15,7 +15,7 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         val database = getDatabase(applicationContext)
-        val repository = AsteroidsRepository(database)
+        val repository = AsteroidsRepository(applicationContext, database)
 
         return try {
             repository.refreshAsteroids()
