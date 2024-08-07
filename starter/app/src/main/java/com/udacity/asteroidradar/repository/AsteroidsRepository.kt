@@ -10,6 +10,8 @@ import com.udacity.asteroidradar.api.NasaApi
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.database.AsteroidsDatabase
 import com.udacity.asteroidradar.database.asDomainModel
+import com.udacity.asteroidradar.getSevenDaysFromNowDate
+import com.udacity.asteroidradar.getTodaysDate
 import com.udacity.asteroidradar.model.Asteroid
 import com.udacity.asteroidradar.model.asDatabaseModel
 import kotlinx.coroutines.Dispatchers
@@ -29,8 +31,11 @@ class AsteroidsRepository(private val context: Context, private val database: As
             val isConnected = activeNetwork?.isConnectedOrConnecting == true
 
             if (isConnected) {
+                val startDate = getTodaysDate()
+                val endDate = getSevenDaysFromNowDate()
+
                 val asteroidsResponse =
-                    NasaApi.service.getAsteroidsAsync("2024-07-30", "2024-08-06").await()
+                    NasaApi.service.getAsteroidsAsync(startDate, endDate).await()
                 val asteroidsList = parseAsteroidsJsonResult(JSONObject(asteroidsResponse))
                 database.asteroidDao.insertAll(*asteroidsList.asDatabaseModel())
             } else {

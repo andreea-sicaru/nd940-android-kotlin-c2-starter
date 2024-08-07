@@ -9,13 +9,18 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.udacity.asteroidradar.main.AsteroidAdapter
 import com.udacity.asteroidradar.model.Asteroid
+import com.udacity.asteroidradar.model.PictureOfDay
 
 @BindingAdapter("statusIcon")
 fun bindAsteroidStatusImage(imageView: ImageView, isHazardous: Boolean) {
     if (isHazardous) {
         imageView.setImageResource(R.drawable.ic_status_potentially_hazardous)
+        imageView.contentDescription =
+            imageView.context.getString(R.string.potentially_hazardous_asteroid_image)
     } else {
         imageView.setImageResource(R.drawable.ic_status_normal)
+        imageView.contentDescription =
+            imageView.context.getString(R.string.not_hazardous_asteroid_image)
     }
 }
 
@@ -23,8 +28,12 @@ fun bindAsteroidStatusImage(imageView: ImageView, isHazardous: Boolean) {
 fun bindDetailsStatusImage(imageView: ImageView, isHazardous: Boolean) {
     if (isHazardous) {
         imageView.setImageResource(R.drawable.asteroid_hazardous)
+        imageView.contentDescription =
+            imageView.context.getString(R.string.potentially_hazardous_asteroid_image)
     } else {
         imageView.setImageResource(R.drawable.asteroid_safe)
+        imageView.contentDescription =
+            imageView.context.getString(R.string.not_hazardous_asteroid_image)
     }
 }
 
@@ -50,14 +59,22 @@ fun bindTextViewToDisplayVelocity(textView: TextView, number: Double) {
  * Uses the Glide library to load an image by URL into an [ImageView]
  */
 @BindingAdapter("imageUrl")
-fun bindImage(imgView: ImageView, imgUrl: String?) {
-    imgUrl?.let {
-        val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
-        Glide.with(imgView.context).load(imgUri).apply(
+fun bindImage(imgView: ImageView, pictureOfDay: PictureOfDay?) {
+    pictureOfDay?.let {
+        if (pictureOfDay.mediaType == "image") {
+            val imgUrl = pictureOfDay.url
+            val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
+            Glide.with(imgView.context).load(imgUri).apply(
                 RequestOptions().placeholder(R.drawable.placeholder_picture_of_day)
                     .error(R.drawable.placeholder_picture_of_day)
             ).into(imgView)
+            imgView.contentDescription = pictureOfDay.title
+        } else {
+            imgView.setImageResource(R.drawable.placeholder_picture_of_day)
+            imgView.contentDescription = imgView.context.getString(R.string.this_is_nasa_s_picture_of_day_showing_nothing_yet)
+        }
     }
+
 }
 
 @BindingAdapter("listData")
