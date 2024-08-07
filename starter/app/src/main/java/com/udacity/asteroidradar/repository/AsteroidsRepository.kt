@@ -20,10 +20,15 @@ import org.json.JSONObject
 
 class AsteroidsRepository(private val context: Context, private val database: AsteroidsDatabase) {
 
-    val asteroids: LiveData<List<Asteroid>> =
+    val allAsteroids: LiveData<List<Asteroid>> =
         database.asteroidDao.getAsteroids().map { it.asDomainModel() }
+    val todaysAsteroids: LiveData<List<Asteroid>> =
+        database.asteroidDao.getAsteroidsByDate(getTodaysDate()).map { it.asDomainModel() }
+    val weekAsteroids: LiveData<List<Asteroid>> =
+        database.asteroidDao.getAsteroidsByInterval(getTodaysDate(), getSevenDaysFromNowDate())
+            .map { it.asDomainModel() }
 
-    suspend fun refreshAsteroids() {
+    suspend fun refreshAsteroids(startDate: String, endDate: String) {
         withContext(Dispatchers.IO) {
 
             val connectivityManager = context.getSystemService<ConnectivityManager>()
@@ -31,9 +36,6 @@ class AsteroidsRepository(private val context: Context, private val database: As
             val isConnected = activeNetwork?.isConnectedOrConnecting == true
 
             if (isConnected) {
-                val startDate = getTodaysDate()
-                val endDate = getSevenDaysFromNowDate()
-
                 val asteroidsResponse =
                     NasaApi.service.getAsteroidsAsync(startDate, endDate).await()
                 val asteroidsList = parseAsteroidsJsonResult(JSONObject(asteroidsResponse))

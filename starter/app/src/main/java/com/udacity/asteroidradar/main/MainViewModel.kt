@@ -7,9 +7,12 @@ import androidx.core.content.getSystemService
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.udacity.asteroidradar.api.NasaApi
 import com.udacity.asteroidradar.database.getDatabase
+import com.udacity.asteroidradar.getSevenDaysFromNowDate
+import com.udacity.asteroidradar.getTodaysDate
 import com.udacity.asteroidradar.model.Asteroid
 import com.udacity.asteroidradar.model.PictureOfDay
 import com.udacity.asteroidradar.repository.AsteroidsRepository
@@ -28,16 +31,25 @@ class MainViewModel(private val application: Application) : ViewModel() {
     private val database = getDatabase(application)
     private val asteroidsRepository = AsteroidsRepository(application.applicationContext, database)
 
-    val asteroids = asteroidsRepository.asteroids
+    var asteroids: LiveData<List<Asteroid>>
+    val _filter: MutableLiveData<Filter> = MutableLiveData(Filter.ALL)
 
     init {
         getPictureOfTheDay()
         refreshAsteroids()
+
+        asteroids = _filter.switchMap {
+            when (it) {
+                Filter.TODAY -> asteroidsRepository.todaysAsteroids
+                Filter.WEEK -> asteroidsRepository.weekAsteroids
+                Filter.ALL -> asteroidsRepository.allAsteroids
+            }
+        }
     }
 
     private fun refreshAsteroids() {
         viewModelScope.launch {
-            asteroidsRepository.refreshAsteroids()
+            asteroidsRepository.refreshAsteroids(getTodaysDate(), getSevenDaysFromNowDate())
         }
     }
 
@@ -65,5 +77,9 @@ class MainViewModel(private val application: Application) : ViewModel() {
 
     fun navigationToSelectedAsteroidComplete() {
         _navigateToSelectedAsteroid.value = null
+    }
+
+    fun onFilterChanged(filter: Filter) {
+        _filter.value = filter
     }
 }

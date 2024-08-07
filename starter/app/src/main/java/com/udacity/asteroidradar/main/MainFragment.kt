@@ -18,14 +18,12 @@ class MainFragment : Fragment() {
     private val viewModel: MainViewModel by lazy {
         val activity = requireActivity()
         ViewModelProvider(
-            this,
-            MainViewModelFactory(activity.application)
+            this, MainViewModelFactory(activity.application)
         ).get(MainViewModel::class.java)
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         val binding = FragmentMainBinding.inflate(inflater)
         binding.lifecycleOwner = this
@@ -55,10 +53,12 @@ class MainFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.show_today_asteroids -> viewModel.onFilterChanged(Filter.TODAY)
+            R.id.show_week_asteroids -> viewModel.onFilterChanged(Filter.WEEK)
+            R.id.show_saved_asteroids -> viewModel.onFilterChanged(Filter.ALL)
+        }
+
         return true
-//        when (item.itemId) {
-//            R.id.show_week_asteroids -> {}
-//            R.id.
-//        }
     }
 }
